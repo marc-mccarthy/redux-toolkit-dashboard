@@ -1,17 +1,20 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-// THIS COMPONENT IS OUR INTERFACE FOR PASSENGER CHECK IN
-// YOU SHOULD DISPLAY THE CURRENT PASSENGERS
-// INPUT SHOULD COLLECT INFO, BUTTON SHOULD ADD THEM TO THE LIST
 
 function Passengers() {
   const dispatch = useDispatch();
-  const passengers = useSelector((store) => store.passengersReducer);
+  // useSelector to pull in the reducer state for 'value' property in passengers state object
+  const passengers = useSelector((state) => state.passengers.value);
 
   const [newPassenger, setNewPassenger] = useState("");
 
   const addPassenger = () => {
-    dispatch({ type: "ADD_PASSENGER", payload: newPassenger });
+    // the type is a string using 'slice name/reducer name' to find correct destination
+    dispatch({
+      type: "passengers/addPassenger",
+      payload: newPassenger,
+      index: 1,
+    });
     setNewPassenger("");
   };
 

@@ -1,20 +1,23 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-// THIS COMPONENT IS OUR INTERFACE FOR SPEED
-// YOU SHOULD DISPLAY THE CURRENT SPEED
-// BUTTONS SHOULD INCREASE OR DECREASE SPEED, RESPECTIVELY
+// pulling in action creators from redux slices for use
+import {
+  decrease,
+  increase,
+} from "../../redux/features/speedControl/speedControlSlice";
 
 function SpeedControl() {
   const dispatch = useDispatch();
-  const speed = useSelector((store) => store.speedControlReducer);
+  // useSelector to pull in the reducer state for 'value' property in speedControl state object
+  const speed = useSelector((state) => state.speedControl.value);
 
   const increaseSpeed = () => {
-    dispatch({ type: "SPEED_UP", payload: 1 });
+    dispatch(increase());
   };
 
   const decreaseSpeed = () => {
     if (speed >= 1) {
-      dispatch({ type: "SPEED_DOWN", payload: 1 });
+      dispatch(decrease());
     }
   };
 
