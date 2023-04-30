@@ -1,18 +1,17 @@
 /**
  * DO NOT TOUCH
- * 
+ *
  * For Prime Instructional Staff use only.
  */
 module.exports = (ctx) => {
   const resultColor = (result) => {
-    if (result.status === 'passed') {
-      return 'success';
+    if (result.status === "passed") {
+      return "success";
+    } else if (result.isStretch || result.isGeneral) {
+      return "secondary";
     }
-    else if (result.isStretch || result.isGeneral) {
-      return 'secondary'
-    }
-    return 'danger';
-  } 
+    return "danger";
+  };
 
   return `
   <!DOCTYPE html>
@@ -60,8 +59,9 @@ module.exports = (ctx) => {
       
       <h1>Test Results</h1>
 
-      ${ctx.execError ?
-        `
+      ${
+        ctx.execError
+          ? `
         <div class="alert alert-danger">
           <h4 class="alert-heading">Tests failed to run!</h4>
           <p>
@@ -75,34 +75,48 @@ module.exports = (ctx) => {
           <pre>${ctx.execError}</pre>
         </div>
         `
-        : ''
+          : ""
       }
       
-      <div class="alert ${{
-        0: 'alert-danger',
-        [ctx.totalCount]: 'alert-success',
-      }[ctx.passingCount] || 'alert-warning'}">
+      <div class="alert ${
+        {
+          0: "alert-danger",
+          [ctx.totalCount]: "alert-success",
+        }[ctx.passingCount] || "alert-warning"
+      }">
         ${ctx.passingCount} / ${ctx.totalCount} Test passing
       </div>
       
       <ul id="accordion" class="list-group">
-        ${ctx.results.map((res, i) => `
-          <li class="list-group-item list-group-item-${resultColor(res)} ${res.hints.length ? 'has-hints' : ''}">
+        ${ctx.results
+          .map(
+            (res, i) => `
+          <li class="list-group-item list-group-item-${resultColor(res)} ${
+              res.hints.length ? "has-hints" : ""
+            }">
             <div class="alert-link" data-toggle="collapse" data-target="#collapse-${i}" aria-expanded="true" aria-controls="collapse-${i}">
               ${escapeHTML(res.fullName)}
             </div>
             
-            ${res.status === 'failed' && res.hints.length ?
-             `
-              <div id="collapse-${i}" class="collapse ${res.isStretch || res.isGeneral ? '' : 'show'}">
+            ${
+              res.status === "failed" && res.hints.length
+                ? `
+              <div id="collapse-${i}" class="collapse ${
+                    res.isStretch || res.isGeneral ? "" : "show"
+                  }">
                 <div class="hintsTitle">Hint:</div>
-                ${res.hints.map(hint => `
+                ${res.hints
+                  .map(
+                    (hint) => `
                   <div class="card-body">
                     ${escapeHTML(hint)}
                   </div>
-                `).join('\n<hr />\n')}
+                `
+                  )
+                  .join("\n<hr />\n")}
               </div>
-             ` : ''
+             `
+                : ""
             }
             
 
@@ -111,23 +125,28 @@ module.exports = (ctx) => {
           </li>
 
 
-        `).join('\n')}
+        `
+          )
+          .join("\n")}
         
       </ul>
     </div>
   </body>
   </html>
 `;
-}
+};
 
 // https://stackoverflow.com/a/20403618/830030
 function escapeHTML(s) {
-  return s.replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    // Replace `some code` with <code>some code</code>
-    .replace(/`(.*?)`/g, (_, match) => `<code>${match}</code>`)
-    // Replace newlines with <br />
-    .replace(/\n/g, '<br />');
+  return (
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      // Replace `some code` with <code>some code</code>
+      .replace(/`(.*?)`/g, (_, match) => `<code>${match}</code>`)
+      // Replace newlines with <br />
+      .replace(/\n/g, "<br />")
+  );
 }

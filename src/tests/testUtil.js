@@ -1,22 +1,20 @@
 /**
  * DO NOT TOUCH
- * 
+ *
  * For Prime Instructional Staff use only.
  */
-import React from 'react';
-import { mount } from 'enzyme';
-import { Provider } from 'react-redux';
-import { MemoryRouter } from 'react-router';
-import validateHTML from 'html-validator';
-import { storeInstance as getStore } from '../index';
+import React from "react";
+import { mount } from "enzyme";
+import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router";
+import validateHTML from "html-validator";
+import { storeInstance as getStore } from "../index";
 
 // Mock react-dom, so we can import `index.js`
 // without actually rendering the app to the DOM.
 // See __mocks__/react-dom.js
 // https://jestjs.io/docs/en/manual-mocks#mocking-node-modules
-jest.mock('react-dom');
-
-
+jest.mock("react-dom");
 
 // Grab the initial state of our redux store,
 // so we can verify that it isn't mutated between tests
@@ -24,9 +22,9 @@ let originalInitState = JSON.stringify(getStore().getState());
 let store;
 beforeEach(() => {
   // Recreate the redux store between each test
-  store = getStore()
+  store = getStore();
 
-  // If a reducer's initial state is mutated, it will effect 
+  // If a reducer's initial state is mutated, it will effect
   // the initial state of the redux store in subsequent tests.
   //
   // eg:
@@ -62,24 +60,19 @@ export function mountWithStore(Component) {
   // Grab the component name, so we can find the
   // actual nested component, and return it.
   // (vs. the router/provider/connect wrappers)
-  let componentName = Component.WrappedComponent ?
-    Component.WrappedComponent.name :
-    Component.name;
+  let componentName = Component.WrappedComponent
+    ? Component.WrappedComponent.name
+    : Component.name;
 
   let provider;
   try {
     provider = mount(
       <MemoryRouter>
-        <Provider store={store}>
-          {React.createElement(Component)}
-        </Provider>
+        <Provider store={store}>{React.createElement(Component)}</Provider>
       </MemoryRouter>
     );
-  }
-  catch (err) {
-    expect(false,
-      `Failed to render <${componentName} />: ${err}`
-    ).toBe(true)
+  } catch (err) {
+    expect(false, `Failed to render <${componentName} />: ${err}`).toBe(true);
   }
 
   // Find the actual component
@@ -90,11 +83,10 @@ export function mountWithStore(Component) {
  * Find an Enzyme element by text
  */
 export function findByText(wrapper, text) {
-  let re = text instanceof RegExp ? text : new RegExp(text)
-  return wrapper.findWhere(node => (
-    node.type() &&
-    re.test(node.text())
-  )).last();
+  let re = text instanceof RegExp ? text : new RegExp(text);
+  return wrapper
+    .findWhere((node) => node.type() && re.test(node.text()))
+    .last();
 }
 
 /**
@@ -130,8 +122,8 @@ export function findDecreaseSpeedButton(wrapper) {
  */
 export function simulateChange(input, value) {
   // Simulate the change event
-  input.simulate('change', {
-    target: { value }
+  input.simulate("change", {
+    target: { value },
   });
 
   // Update the value of the `input` element
@@ -140,18 +132,15 @@ export function simulateChange(input, value) {
   return input;
 }
 
-
 /**
  * Click on a link.
  * Supports <Link /> elements
  * It's harder than you'd think!
  */
 export function clickLink(wrapper, linkText) {
-  let link = wrapper.findWhere(node => (
-    node.type() &&
-    node.name() === 'a' &&
-    node.text() === linkText
-  ));
+  let link = wrapper.findWhere(
+    (node) => node.type() && node.name() === "a" && node.text() === linkText
+  );
 
   expect(
     link.length,
@@ -161,8 +150,8 @@ export function clickLink(wrapper, linkText) {
   // react-router needs a `{ button: 0 }` value
   // in the event object ¯\_(ツ)_/¯
   // See https://github.com/enzymejs/enzyme/issues/516
-  link.simulate('click', {
-    button: 0
+  link.simulate("click", {
+    button: 0,
   });
 
   return wrapper.update();
@@ -175,8 +164,9 @@ export function clickLink(wrapper, linkText) {
 export function getPassengersReduxState() {
   // Iterate through the redux state,
   // and look for a key called "passengers*"
-  let reduxKey = Object.keys(getReduxState())
-    .find(key => /(passenger|person|people|name|list)/i.test(key));
+  let reduxKey = Object.keys(getReduxState()).find((key) =>
+    /(passenger|person|people|name|list)/i.test(key)
+  );
 
   // Check that there's a "passenger*" key in the redux state
   expect(
@@ -190,7 +180,11 @@ export function getPassengersReduxState() {
 
   // The passenger list might be wrapped in an object
   // like { passengers: ['A', 'B', 'C'] }
-  if (passengerList && !Array.isArray(passengerList) && typeof passengerList === 'object') {
+  if (
+    passengerList &&
+    !Array.isArray(passengerList) &&
+    typeof passengerList === "object"
+  ) {
     passengerList = Object.values(passengerList)[0];
   }
 
@@ -205,12 +199,12 @@ export function getPassengersReduxState() {
 }
 
 export function getSpeedReduxState() {
-  // Iterate through the redux state, 
+  // Iterate through the redux state,
   // and find a key that looks like "speed" or "speedReducer"
   let reduxSpeedKey = Object.keys(getReduxState())
     // Hopefully they named their redux key something like "speed"
     // or "currentSpeed" or ....
-    .find(key => /speed|count/i.test(key))
+    .find((key) => /speed|count/i.test(key));
 
   // Verify that we found the `speed` value in the redux store
   expect(
@@ -221,9 +215,9 @@ export function getSpeedReduxState() {
     `
   ).toBeDefined();
 
-  // Sniff out the speed data type, and attempt to grab 
+  // Sniff out the speed data type, and attempt to grab
   // the actual numeric value from the redux state.
-  // 
+  //
   // Students often keep the `speed` as a number, as an object, or as an array
   // This logic won't catch *all* the weird ways students may represent their speed,
   // but should catch the bulk of them.
@@ -233,7 +227,7 @@ export function getSpeedReduxState() {
     return speed[0];
   }
   // If it's an object, assume the speed is the first value in the object
-  else if (typeof speed === 'object' && !!speed) {
+  else if (typeof speed === "object" && !!speed) {
     return Object.values(speed)[0];
   }
   // Otherwise, assume the redux state is a number
@@ -242,67 +236,60 @@ export function getSpeedReduxState() {
   }
 }
 
-
 /**
  * Return the Passenger list view elements.
- * 
+ *
  * We're being forgiving here, for bad HTML.
  * For example, this will catch something like:
- * 
+ *
  * <ul>
  *  <p>Passenger A</p>
  *  <p>Passenger B</p>
  * </ul>
- * 
+ *
  * or
- * 
+ *
  * <ul>PASSENGER LIST GOES HERE<ul>
  * <li>Passenger A</li>
  * <li>Passenger B</li>
  *
- * Note that we test HTML correctness 
+ * Note that we test HTML correctness
  * separately, as a GENERAL item
  */
 export function findPassengerListItems(wrapper) {
   // Try finding any element inside the <ul>
-  let passengers = wrapper.find('ul').children('*');
+  let passengers = wrapper.find("ul").children("*");
   if (passengers.length) {
     return passengers;
   }
 
   // Try finding <li> items elsewhere on the page
-  return wrapper.find('li');
+  return wrapper.find("li");
 }
 
 /**
  * Validate the HTML within an Enzyme component.
- * 
+ *
  * Uses https://github.com/zrrrzzt/html-validator
  */
-export async function expectValidHTML(wrapper, name = 'App') {
+export async function expectValidHTML(wrapper, name = "App") {
   let res;
   try {
     res = await validateHTML({
-      validator: 'WHATWG',
+      validator: "WHATWG",
       data: wrapper.update().html(),
-      isFragment: true
+      isFragment: true,
     });
-  }
-  catch (err) {
-    expect(
-      err,
-      `HTML Validation of ${name} failed.`
-    ).toBeUndefined()
+  } catch (err) {
+    expect(err, `HTML Validation of ${name} failed.`).toBeUndefined();
   }
 
   // Remove duplicate error messages
-  let uniqueErrors = [
-    ...new Set(res.errors.map(e => e.message))
-  ];
+  let uniqueErrors = [...new Set(res.errors.map((e) => e.message))];
 
   expect(
     res.isValid,
     `${name} has invalid HTML: 
-     ${uniqueErrors.join(';\n')}`
+     ${uniqueErrors.join(";\n")}`
   ).toBe(true);
 }
